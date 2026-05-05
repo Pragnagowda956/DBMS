@@ -1,0 +1,42 @@
+CREATE DATABASE college_db;
+USE college_db;
+CREATE TABLE Student(
+student_id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100),
+age INT,
+gender VARCHAR(10),
+department VARCHAR(50));
+DESC Student;
+CREATE TABLE db_courses(
+courses_id INT PRIMARY KEY AUTO_INCREMENT,
+courses_name VARCHAR(100),
+instructor VARCHAR(100),
+credits INT);
+DESC db_courses;
+CREATE TABLE db_enrollments(
+enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+student_id INT,
+courses_id INT,
+semester VARCHAR(20),
+FOREIGN KEY(student_id) REFERENCES student(student_id),
+FOREIGN KEY(courses_id) REFERENCES db_courses(courses_id));
+DESC db_enrollments;
+INSERT INTO student (name,age,gender,department)
+VALUES('Alice Johnson',20,'Female','Computer Science'),
+('Bob smith',22,'Male','Mechanical Engineering'),
+('Charlie Brown',21,'Male','ELectrical Engineering');
+INSERT INTO db_courses (courses_name,instructor,credits)
+VALUES('Database System','Dr.williams',3),
+('Operating systems','Dr.Johnson',4),
+('Thermodynamics','Dr.lee',3);
+INSERT INTO db_enrollments(student_id,courses_id,semester)
+VALUES(1,1,'Fall 2024'),(1,2,'Fall 2024'),
+(2,3,'spring 2024'),(3,1,'spring 2024');
+SELECT*FROM Student;
+SELECT*FROM db_courses;
+SELECT*FROM db_enrollments;
+SELECT s.name As Student,c.courses_name As db_courses,e.semester
+FROM db_enrollments e
+JOIN Student s ON e.Student_id=s.Student_id
+JOIN db_courses c ON e.courses_id=c.courses_id
+
