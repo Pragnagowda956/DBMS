@@ -1,3 +1,4 @@
+0.
 CREATE DATABASE college_db;
 USE college_db;
 CREATE TABLE Student(
@@ -39,4 +40,148 @@ SELECT s.name As Student,c.courses_name As db_courses,e.semester
 FROM db_enrollments e
 JOIN Student s ON e.Student_id=s.Student_id
 JOIN db_courses c ON e.courses_id=c.courses_id
+
+1.
+CREATE USER pavi@localhost identified by 'pavi';
+GRANT ALL PRIVILEGES ON *.* TO 'pavi'@'localhost' WITH GRANT OPTION;
+CREATE DATABASE Employee;
+USE Employee;
+CREATE TABLE Employee(EMPNO INT,
+ENAME VARCHAR(225) NOT NULL,
+JOB VARCHAR(225) NOT NULL,
+MANAGER_NO INT NOT NULL,
+SAL DECIMAL(10,2) NOT NULL,
+COMMISSION DECIMAL(10,2) NOT NULL);
+DESC Employee;
+INSERT INTO Employee(EMPNO,ENAME,JOB,MANAGER_NO,SAL,COMMISSION)
+VALUES(1,'Ajay kumar','Manager',2,5000.00,1000.00);
+INSERT INTO Employee(EMPNO,ENAME,JOB,MANAGER_NO,SAL,COMMISSION)
+VALUES(2,'Amith kumar','HRManager',4,7000.00,3000.00);
+INSERT INTO Employee(EMPNO,ENAME,JOB,MANAGER_NO,SAL,COMMISSION)
+VALUES(3,'Amar kumar','Tester',8,3000.00,2000.00);
+ALTER TABLE Employee ADD PRIMARY KEY(EMPNO)
+ALTER TABLE Employee MODIFY ENAME VARCHAR(255);
+INSERT INTO Employee(EMPNO,ENAME,JOB,MANAGER_NO,SAL,COMMISSION)
+VALUES(5,'Hemanth','tester',6,8000.00,2500.00);
+SELECT *FROM Employee
+
+3.
+CREATE DATABASE CompanyDB;
+USE CompanyDB;
+
+CREATE TABLE Employee (
+    E_id INT PRIMARY KEY,
+    E_name VARCHAR(100),
+    Age INT,
+    Salary DECIMAL(10,2)
+);
+
+SELECT COUNT(E_name) AS NumberOfEmployees
+FROM Employee;
+
+SELECT MAX(Age) AS MaxAge
+FROM Employee;
+
+SELECT MIN(Age) AS MinAge
+FROM Employee;
+
+SELECT Salary
+FROM Employee
+ORDER BY Salary ASC;
+
+SELECT Salary, COUNT(*) AS NumberOfEmployees
+FROM Employee
+GROUP BY Salary;
+
+INSERT INTO Employee (E_id, E_name, Age, Salary) VALUES
+(1, 'John', 30, 50000.00),
+(2, 'Jane', 35, 60000.00),
+(3, 'David', 40, 70000.00),
+(4, 'Emily', 25, 45000.00),
+(5, 'Michael', 45, 80000.00);
+
+4.
+CREATE DATABASE CUSTOMERS_DB;
+USE CUSTOMERS_DB;
+
+CREATE TABLE CUSTOMERS (
+    ID INT PRIMARY KEY,
+    NAME VARCHAR(255),
+    AGE INT,
+    ADDRESS VARCHAR(255),
+    SALARY DECIMAL(10,2)
+);
+
+INSERT INTO CUSTOMERS VALUES
+(1, 'Ajay Hegde', 50, 'Mysuru', 50000.00),
+(2, 'Satyanarayana Rao', 65, 'Mandya', 45000.00),
+(3, 'Ravishankar', 35, 'Shivamogga', 60000.00),
+(4, 'Anish Behl', 28, 'Mangalore', 80000.00),
+(5, 'Hari Das Upadaya', 28, 'Udupi', 90000.00);
+
+SELECT * FROM CUSTOMERS;
+
+DELIMITER //
+
+CREATE TRIGGER after_insert_salary_difference
+AFTER INSERT ON CUSTOMERS
+FOR EACH ROW
+BEGIN
+    SET @my_sal_diff = CONCAT('Salary inserted is ', NEW.SALARY);
+END //
+
+DELIMITER ;
+
+INSERT INTO CUSTOMERS VALUES
+(6, 'Amit Kumar', 38, 'Bijapur', 90000.00);
+
+SELECT @my_sal_diff AS SALARY_INSERTED;
+
+DELIMITER //
+
+CREATE TRIGGER after_update_salary_difference
+AFTER UPDATE ON CUSTOMERS
+FOR EACH ROW
+BEGIN
+    DECLARE old_salary DECIMAL(10,2);
+    DECLARE new_salary DECIMAL(10,2);
+
+    SET old_salary = OLD.SALARY;
+    SET new_salary = NEW.SALARY;
+
+    SET @my_sal_diff = CONCAT(
+        'Salary difference after update is ',
+        (new_salary - old_salary)
+    );
+END //
+
+DELIMITER ;
+UPDATE CUSTOMERS
+SET SALARY = 95000
+WHERE ID = 6;
+
+SELECT @my_sal_diff AS Salary_Difference;
+
+DELIMITER //
+
+CREATE TRIGGER after_delete_salary_difference
+AFTER DELETE ON CUSTOMERS
+FOR EACH ROW
+BEGIN
+    SET @my_sal_diff = CONCAT(
+        'Salary deleted is ',
+        OLD.SALARY
+    );
+END //
+
+DELIMITER ;
+
+SELECT * FROM CUSTOMERS;
+
+DELETE FROM CUSTOMERS
+WHERE ID = 1;
+
+SELECT @my_sal_diff AS Deleted_Salary;
+
+SELECT * FROM CUSTOMERS;
 
