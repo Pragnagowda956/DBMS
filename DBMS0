@@ -65,6 +65,46 @@ INSERT INTO Employee(EMPNO,ENAME,JOB,MANAGER_NO,SAL,COMMISSION)
 VALUES(5,'Hemanth','tester',6,8000.00,2500.00);
 SELECT *FROM Employee
 
+2.
+-- Create the Employee table:
+CREATE TABLE Employee1 (EMPNO INT,
+ENAME VARCHAR(100),
+JOB VARCHAR(50),
+MGR INT,
+SAL DECIMAL(10, 2));
+
+--  Add a column commission with domain to the Employeetable.
+ALTER TABLE Employee1
+ADD COMMISSION DECIMAL(10, 2) CHECK (COMMISSION >= 0);
+
+-- Insert any five records into the table. 
+INSERT INTO Employee1 (EMPNO, ENAME, JOB, MGR, SAL, COMMISSION) VALUES
+(101, 'John Doe', 'Manager', NULL, 50000.00, 1500.00);
+INSERT INTO Employee1 (EMPNO, ENAME, JOB, MGR, SAL, COMMISSION) VALUES 
+(102, 'Jane Smith', 'Developer', 101, 45000.00, 1000.00);
+INSERT INTO Employee1 (EMPNO, ENAME, JOB, MGR, SAL, COMMISSION) VALUES
+(103, 'Eric Johnson', 'Analyst', 101, 40000.00, 800.00);
+INSERT INTO Employee1 (EMPNO, ENAME, JOB, MGR, SAL, COMMISSION) VALUES 
+(104, 'Mary Jane', 'Designer', 103, 35000.00, 500.00);
+INSERT INTO Employee1 (EMPNO, ENAME, JOB, MGR, SAL, COMMISSION) VALUES
+ (105, 'Alice Brown', 'Tester', 104, 30000.00, 300.00);
+
+select * from employee1;
+
+--  Update the column details of the job 
+UPDATE Employee1
+SET JOB = 'Quality Analyst'
+WHERE EMPNO = '105';
+
+-- Rename a column of the Employee table using the ALTER command 
+ALTER TABLE Employee1
+CHANGE COLUMN MGR  MANAGER_ID INT;
+
+-- Delete the employee whose EMPNO is 105 
+DELETE FROM Employee1
+WHERE EMPNO = 105;
+
+
 3.
 CREATE DATABASE CompanyDB;
 USE CompanyDB;
@@ -184,4 +224,144 @@ WHERE ID = 1;
 SELECT @my_sal_diff AS Deleted_Salary;
 
 SELECT * FROM CUSTOMERS;
+
+5.
+-- Create cursor for Employee table & extract the values 
+-- from the table. Declare the variables 
+-- ,Open the cursor & extrct the values from the cursor. 
+-- Close the cursor. 
+-- Employee(E_id, E_name, Age, Salary) 
+
+
+create database pg5;
+use pg5;
+CREATE TABLE Employee1 ( E_id INT, 
+E_name VARCHAR(255), 
+Age INT, 
+Salary DECIMAL(10, 2)); 
+
+INSERT INTO Employee1 (E_id, E_name, Age, Salary) 
+VALUES (1, 'Samarth', 30, 50000.00); 
+INSERT INTO Employee1 (E_id, E_name, Age, Salary) 
+VALUES(2, 'Ramesh Kumar', 25, 45000.00); 
+INSERT INTO Employee1 (E_id, E_name, Age, Salary) 
+VALUES(3, 'Seema Banu', 35, 62000.00);
+INSERT INTO Employee1 (E_id, E_name, Age, Salary) 
+VALUES(4, 'Dennis Anil', 28, 52000.00);
+INSERT INTO Employee1 (E_id, E_name, Age, Salary) 
+VALUES(5, 'Rehman Khan', 32, 58000.00);
+
+SELECT * FROM Employee1;
+
+DELIMITER $$ 
+CREATE PROCEDURE gettable1( INOUT Tableontents varchar(4000))  
+BEGIN 
+	DECLARE finished INTEGER DEFAULT 0; 
+	DECLARE content varchar(100) DEFAULT ""; 
+#Cursor declaration 
+DEClARE curName1 CURSOR FOR 
+	SELECT concat(E_id ,' , ' , E_name,Age ,' , ' , Salary) 
+	FROM Employee1 
+	order by E_id desc; 
+#declare NOT FOUND handler 
+DECLARE CONTINUE HANDLER FOR NOT FOUND 
+SET finished = 1; 
+#Open cursor 
+OPEN curName1; 
+#fetch records 
+getName1: LOOP 
+FETCH curName1 INTO content; 
+IF finished = 1 THEN LEAVE getName1; 
+END IF; 
+SET Tableontents = CONCAT(content,";",Tableontents); 
+END LOOP getName1; 
+CLOSE curName1; 
+END$$ 
+
+
+SET @Tableontents = ""; 
+CALL gettable1(@Tableontents); 
+SELECT @Tableontents;
+
+6.
+-- Lab Program 6 
+-- Write a PL/SQL block of code using parameterized Cursor, 
+-- that will merge the data available 
+-- in the newly created table N_RollCall with the 
+-- data available in the table O_RollCall. 
+-- If the data in the first table already exist 
+-- in the second table, then that data should be skipped. 
+   
+   CREATE DATABASE ROLLCALL; 
+   USE ROLLCALL; 
+   -- Create N_RollCall table 
+CREATE TABLE N_RollCall ( 
+student_id INT PRIMARY KEY, 
+student_name VARCHAR (255), 
+birth_date DATE); 
+
+-- Create O_RollCall table with common data 
+CREATE TABLE O_RollCall ( 
+student_id INT PRIMARY KEY, 
+student_name VARCHAR (255), 
+birth_date DATE); 
+
+INSERT INTO O_RollCall (student_id, student_name, birth_date)
+VALUES (1, 'Amith', '1995-08-15'); 
+INSERT INTO O_RollCall (student_id, student_name, birth_date)
+VALUES(2, 'Ajay', '1990-12-10'); 
+
+SELECT * FROM O_RollCall;
+
+INSERT INTO N_RollCall (student_id, student_name, birth_date) 
+VALUES (1, 'Amith', '1995-08-15'); -- Common record with O_RollCall 
+INSERT INTO N_RollCall (student_id, student_name, birth_date) 
+VALUES(2, 'Ajay', '1990-12-10'); 
+INSERT INTO N_RollCall (student_id, student_name, birth_date) 
+VALUES(3, 'Ravi', '1990-12-10'); -- Common record with O_RollCall 
+INSERT INTO N_RollCall (student_id, student_name, birth_date) 
+VALUES(4, 'Rakesh', '2000-05-18'); 
+INSERT INTO N_RollCall (student_id, student_name, birth_date) 
+VALUES(5, 'Vinay', '1997-09-03');
+
+SELECT * FROM N_RollCall;
+
+-- DROP PROCEDURE merge_rollcall_data;
+
+DELIMITER // 
+
+CREATE PROCEDURE merge_rollcall_data() 
+BEGIN 
+		DECLARE done INT DEFAULT FALSE; 
+		DECLARE n_id INT; 
+		DECLARE n_name VARCHAR (255); 
+		DECLARE n_birth_date DATE; 
+-- Declare cursor for N_RollCall table 
+		DECLARE n_cursor CURSOR FOR 
+		SELECT student_id, student_name, birth_date FROM N_RollCall; -- Declare handler for cursor 
+DECLARE CONTINUE HANDLER FOR NOT FOUND 
+SET done = TRUE; 
+-- Open the cursor 
+OPEN n_cursor; 
+-- Start looping through cursor results 
+cursor_loop: LOOP -- Fetch data from cursor into variables 
+FETCH n_cursor INTO n_id, n_name, n_birth_date; 
+-- Check if no more rows to fetch 
+IF done THEN 
+LEAVE cursor_loop; 
+END IF; 
+-- Check if the data already exists in O_RollCall IF NOT EXISTS  
+(SELECT 1 FROM O_RollCall WHERE student_id = n_id);
+ -- Insert the record into O_RollCall 
+INSERT INTO O_RollCall(student_id, student_name, birth_date) VALUES (n_id, n_name, n_birth_date); 
+
+END LOOP; 
+-- Close the cursor 
+CLOSE n_cursor; 
+END// 
+DELIMITER ;
+
+call merge_rollcall_data();
+delete FROM O_RollCall;
+SELECT * FROM O_RollCall;
 
