@@ -1,0 +1,39 @@
+CREATE USER 'pragna'@'localhost' IDENTIFIED BY 'pragna';
+GRANT ALL PRIVILEGES ON *.* TO 'pragna'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+CREATE DATABASE EmployeeDB;
+USE EmployeeDB;
+
+CREATE TABLE Employee (
+    EMPNO INT,
+    ENAME VARCHAR(50),
+    JOB VARCHAR(50),
+    MANAGER_NO INT,
+    SAL DECIMAL(10,2),
+    COMMISSION DECIMAL(10,2)
+);
+
+INSERT INTO Employee
+VALUES
+(101,'Ajay Kumar','Manager',201,50000,5000),
+(102,'Amith Kumar','HR Manager',202,45000,4000),
+(103,'Amar Kumar','Tester',203,30000,2000);
+
+SELECT * FROM Employee;
+ROLLBACK;
+
+ALTER TABLE Employee
+ADD PRIMARY KEY (EMPNO);
+
+ALTER TABLE Employee
+MODIFY ENAME VARCHAR(50) NOT NULL;
+
+DESC Employee;
+
+INSERT INTO Employee
+VALUES
+(104,NULL,'Developer',NULL, NULL, NULL);
+INSERT INTO Employee
+VALUES(105,'A','Developer',NULL, NULL, NULL);
+SELECT * FROM Employee;
